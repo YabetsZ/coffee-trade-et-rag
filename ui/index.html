@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amharic Coffee RAG</title>
+  <style>
+    :root {
+      --bg: #f6f2e9;
+      --card: #fffdf8;
+      --text: #241e17;
+      --muted: #6d6255;
+      --accent: #6f3f1e;
+      --accent-2: #9a6a3a;
+      --border: #e4d8c7;
+      --ok: #205f35;
+      --err: #9a1f1f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 10%, #ffffff 0%, transparent 40%),
+        radial-gradient(circle at 80% 90%, #f1dfc7 0%, transparent 35%),
+        var(--bg);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: min(920px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(60, 34, 17, 0.12);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #fff6e8, #f4e8d9);
+    }
+
+    .title {
+      margin: 0;
+      font-size: 1.4rem;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .content {
+      padding: 20px 24px 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 1rem;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent-2);
+      box-shadow: 0 0 0 3px rgba(154, 106, 58, 0.18);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      padding: 11px 16px;
+      font-size: 0.98rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    .ghost {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid var(--accent-2);
+    }
+
+    .status {
+      font-size: 0.92rem;
+      min-height: 1.3rem;
+    }
+
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    .answer {
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+
+    .sources {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .content { padding: 16px; }
+      .header { padding: 16px; }
+      .title { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <header class="header">
+      <h1 class="title">☕ የቡና ሕግ ረዳት (Coffee Law Assistant)</h1>
+      <div class="subtitle">Local JS UI -> Kaggle ngrok API</div>
+    </header>
+
+    <section class="content">
+      <div>
+        <label for="apiUrl">Kaggle API URL (/ask)</label>
+        <input id="apiUrl" type="url" value="" placeholder="https://xxxx.ngrok-free.app/ask" />
+      </div>
+
+      <div>
+        <label for="question">ጥያቄዎን ያስገቡ (Your question)</label>
+        <textarea id="question" placeholder="ለምሳሌ፦ የቡና ጥራት ደረጃ እንዴት ይወሰናል?"></textarea>
+      </div>
+
+      <div class="row">
+        <button id="askBtn">ጠይቅ (Ask)</button>
+        <button id="clearBtn" class="ghost" type="button">Clear</button>
+      </div>
+
+      <div id="status" class="status"></div>
+
+      <div class="panel">
+        <h3>መልስ (Answer)</h3>
+        <div id="answer" class="answer">No answer yet.</div>
+      </div>
+
+      <div class="panel">
+        <h3>ምንጮች (Sources)</h3>
+        <ul id="sources" class="sources"></ul>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const apiUrlEl = document.getElementById("apiUrl");
+    const questionEl = document.getElementById("question");
+    const askBtn = document.getElementById("askBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const statusEl = document.getElementById("status");
+    const answerEl = document.getElementById("answer");
+    const sourcesEl = document.getElementById("sources");
+
+    const savedUrl = localStorage.getItem("kaggle_api_url");
+    if (savedUrl) apiUrlEl.value = savedUrl;
+
+    function setStatus(msg, mode = "") {
+      statusEl.textContent = msg;
+      statusEl.className = `status ${mode}`;
+    }
+
+    function setLoading(isLoading) {
+      askBtn.disabled = isLoading;
+      askBtn.textContent = isLoading ? "Asking..." : "ጠይቅ (Ask)";
+    }
+
+    function renderSources(sources) {
+      sourcesEl.innerHTML = "";
+      if (!Array.isArray(sources) || sources.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "No sources returned.";
+        sourcesEl.appendChild(li);
+        return;
+      }
+
+      sources.forEach((src) => {
+        const li = document.createElement("li");
+        li.textContent = String(src);
+        sourcesEl.appendChild(li);
+      });
+    }
+
+    async function askQuestion() {
+      const apiUrl = apiUrlEl.value.trim();
+      const query = questionEl.value.trim();
+
+      if (!apiUrl) {
+        setStatus("Please set the Kaggle API URL.", "err");
+        return;
+      }
+      if (!query) {
+        setStatus("Please type a question first.", "err");
+        return;
+      }
+
+      localStorage.setItem("kaggle_api_url", apiUrl);
+      setLoading(true);
+      setStatus("Kaggle is processing your question...", "");
+
+      try {
+        const resp = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query }),
+        });
+
+        if (!resp.ok) {
+          const msg = `Request failed: ${resp.status} ${resp.statusText}`;
+          throw new Error(msg);
+        }
+
+        const data = await resp.json();
+        answerEl.textContent = data.answer || "No answer returned.";
+        renderSources(data.sources);
+        setStatus("Connected and answered successfully.", "ok");
+      } catch (err) {
+        answerEl.textContent = "Connection failed.";
+        renderSources([]);
+        setStatus(`Connection failed: ${err.message}`, "err");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    askBtn.addEventListener("click", askQuestion);
+    questionEl.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") askQuestion();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      questionEl.value = "";
+      answerEl.textContent = "No answer yet.";
+      sourcesEl.innerHTML = "";
+      setStatus("");
+      questionEl.focus();
+    });
+  </script>
+</body>
+</html>
