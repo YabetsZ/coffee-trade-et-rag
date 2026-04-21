@@ -1,133 +1,239 @@
-# Amharic Coffee Trade RAG Assistant
+# Amharic Coffee Trade RAG
 
-A simple Retrieval-Augmented Generation (RAG) project for an NLP assignment using Amharic coffee trade and regulation text.
+End-to-end Retrieval-Augmented Generation (RAG) system for Ethiopian coffee trade and regulation documents in Amharic.
 
-## Recommended domain
+This guide explains how to run the project:
+1. On Kaggle
+2. On Google Colab
+3. Locally with the JavaScript UI and an ngrok-backed API
 
-**Domain:** Coffee trade and regulation  
-**Language:** Amharic  
-**Project focus:** Ethiopian rulings on selling, buying, grading, and trading coffee
+## Overview
 
-## Project title
+The pipeline does the following:
+1. Loads documents from `data/corpus`
+2. Splits text into overlapping chunks
+3. Embeds chunks with multilingual embeddings
+4. Stores vectors in FAISS
+5. Retrieves top relevant chunks for a query
+6. Generates an answer with an instruction-tuned LLM
 
-**Amharic Coffee Trade Regulation RAG System**
+Main implementation files:
+1. `src/load_docs.py`
+2. `src/index.py`
+3. `src/rag.py`
+4. `src/cli.py`
+5. `ui/index.html`
 
-## Project objectives
+## Requirements
 
-1. Build a retrieval-augmented question answering system for Amharic coffee trade content.
-2. Collect and organize a small Amharic corpus from coffee proclamations and regulation PDFs.
-3. Use pretrained multilingual embeddings to retrieve relevant passages.
-4. Use a pretrained generative model to produce a grounded answer in Amharic.
-5. Demonstrate that RAG can support local-language access to Ethiopian coffee trade rules.
+1. Python 3.10+
+2. `pip install -r requirements.txt`
+3. Dataset files in `data/corpus`
 
-## Why this is a good assignment topic
+## Quick Local CLI Test
 
-- Coffee is strongly connected to Ethiopian identity, economy, and exports.
-- Legal and regulatory PDFs are clean, focused, and excellent for RAG.
-- It demonstrates a real RAG pipeline.
-- It can work with pretrained multilingual models.
-- You can extend it with your own documents later.
+Run from repo root:
 
-## Actual data source options
+```bash
+pip install -r requirements.txt
+python -m src.cli --build
+python -m src.cli --ask "የቡና ጥራት መስፈርቶች ምንድን ናቸው?"
+```
 
-Use these public sources to build the corpus. Check the pages for Amharic content, PDFs, proclamations, legal notices, or downloadable guides.
+If `--build` succeeds, FAISS artifacts are written to `artifacts`.
 
-1. Ministry of Agriculture, Ethiopia
-   - Coffee trade policies, extension guidance, farm management documents
-   - https://www.moa.gov.et/
+## Kaggle Runbook
 
-2. Ethiopian Institute of Agricultural Research (EIAR)
-   - Coffee research reports, pest control guidance, technology notes
-   - https://www.eiar.gov.et/
+### 1. Notebook settings
 
-3. Ethiopian Coffee and Tea Authority
-   - Coffee value-chain information, quality guidance, export-related materials
-   - https://www.eca.gov.et/
+1. Open a new notebook
+2. Enable Internet
+3. Use GPU T4
 
-4. Agricultural Transformation Institute (ATI)
-   - Extension materials, value-chain reports, farmer support content
-   - https://www.ati.gov.et/
+### 2. Clone repo and install dependencies
 
-5. FAO Ethiopia
-   - Farmer guidance, sustainable agriculture, and coffee-related resources
-   - https://www.fao.org/ethiopia/
+```python
+import os
+import shutil
 
-6. Regional agriculture bureaus and extension offices
-   - Practical local guides, training documents, bulletin-style materials
-   - Example: Oromia, Amhara, and SNNPR regional websites
+REPO_URL = "https://github.com/YabetsZ/coffee-trade-et-rag.git"
+PROJECT_NAME = "nlp-project"
+WORKING_DIR = f"/kaggle/working/{PROJECT_NAME}"
 
-7. University repositories and theses
-   - Coffee theses, processing studies, and extension research with local context
-   - Look for institutional repositories from Ethiopian universities
+if os.path.exists(WORKING_DIR):
+    shutil.rmtree(WORKING_DIR)
 
-8. Local Amharic news and coffee articles
-   - Interviews, extension summaries, farming tips, seasonal crop advice
-   - Good for small web-scraped additions
+!git clone {REPO_URL} {WORKING_DIR}
+%cd {WORKING_DIR}
 
-## Best immediate source set
+!pip install -U pip
+!pip install -r requirements.txt
+!pip install -U flask pyngrok flask-cors accelerate sentencepiece
+```
 
-If you already found 4 coffee PDF files, use them as the core corpus. That is enough for a class RAG demo if the PDFs are clear and topic-specific.
+### 3. Build index
 
-Recommended document types:
+```python
+!ls -la data/corpus | head
+!python -m src.cli --build
+```
 
-- coffee trading proclamation
-- coffee grading or quality regulation
-- coffee buying and selling rules
-- coffee export or licensing procedure document
+### 4. Start Flask + ngrok API bridge
 
-## Starter corpus structure
+Security note: never hardcode ngrok token in notebook cells. Store it in Kaggle Secrets as `NGROK_AUTHTOKEN`.
 
-A small, clean starter corpus can be organized like this:
+```python
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from pyngrok import ngrok
+from kaggle_secrets import UserSecretsClient
+import traceback
 
-- `data/corpus/coffee_trade_law_1.txt` — main proclamation or legal text
-- `data/corpus/coffee_trade_law_2.txt` — buying and selling rules
-- `data/corpus/coffee_trade_law_3.txt` — grading, quality, and market rules
-- `data/corpus/coffee_trade_law_4.txt` — export or licensing rules
-- Optional extras: `data/corpus/coffee_trade_summary.txt`, `data/corpus/coffee_terms.txt`
+from src.rag import RAGSystem
 
-You can keep the corpus small at first and add more legal or policy documents later.
+secrets = UserSecretsClient()
+NGROK_TOKEN = secrets.get_secret("NGROK_AUTHTOKEN")
+ngrok.set_auth_token(NGROK_TOKEN)
 
-## System architecture
+app = Flask(__name__)
+CORS(app)
+rag = RAGSystem()
 
-1. Load Amharic text documents from `data/corpus/`
-2. Split documents into overlapping chunks
-3. Convert chunks into embeddings with a pretrained multilingual model
-4. Store vectors in a FAISS index
-5. Retrieve the most relevant chunks for a query
-6. Generate a final answer with a pretrained text-to-text model
+@app.get("/health")
+def health():
+    return jsonify({"status": "ok"})
 
-## Default models
+@app.post("/ask")
+def ask():
+    try:
+        data = request.get_json(silent=True) or {}
+        query = (data.get("query") or "").strip()
+        if not query:
+            return jsonify({"error": "query is required"}), 400
 
-- Embeddings: `intfloat/multilingual-e5-small`
-- Generator: `google/mt5-small`
+        answer, contexts = rag.generate(query)
+        sources = [
+            f"{c['source']} (chunk {c['chunk_id']}, score={c['score']:.4f})"
+            for c in contexts
+        ]
+        return jsonify({"answer": answer, "sources": sources})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
-## Folder structure
+tunnel = ngrok.connect(5000)
+print("API BASE:", tunnel.public_url)
+print("ASK URL :", f"{tunnel.public_url}/ask")
 
-- `data/corpus/` — Amharic source documents
-- `data/sources.md` — list of source websites and collection notes
-- `artifacts/` — saved FAISS index and metadata
-- `src/` — code for loading, indexing, retrieval, and generation
+app.run(host="0.0.0.0", port=5000)
+```
 
-## How to run
+### 5. Test API quickly
 
-1. Install dependencies:
-   - `pip install -r requirements.txt`
-2. Build the index:
-   - `python -m src.cli --build`
-3. Ask a question:
-   - `python -m src.cli --ask "ቡና ለመሸጥ ምን የሕግ መመሪያዎች አሉ?"`
+```python
+import requests
 
-## What to submit
+ASK_URL = "PASTE_NGROK_ASK_URL_HERE"
+r = requests.post(ASK_URL, json={"query": "የቡና ሕጋዊ የሽያጭ መመሪያ ምንድን ነው?"}, timeout=120)
+print(r.status_code)
+print(r.json())
+```
 
-For your assignment, you can submit:
+## Colab Runbook
 
-- this code base
-- a short report explaining the RAG pipeline
-- screenshots of sample questions and answers
-- a short explanation of the chosen dataset
+### 1. Clone and install
 
-## Notes
+```python
+!git clone https://github.com/YabetsZ/coffee-trade-et-rag.git
+%cd coffee-trade-et-rag
+!pip install -U pip
+!pip install -r requirements.txt
+!pip install -U flask pyngrok flask-cors accelerate sentencepiece
+```
 
-- The sample documents are small demo texts.
-- For a stronger project, replace them with real Amharic PDFs, proclamations, regulations, or notices.
-- If a source is not in Amharic, keep only the Amharic sections or use it as background reference.
+### 2. Build index
+
+```python
+!ls -la data/corpus | head
+!python -m src.cli --build
+```
+
+### 3. Run API bridge
+
+Use the same Flask + ngrok cell from Kaggle. In Colab, read token from environment variable or input prompt, not hardcoded source.
+
+## Local JavaScript UI
+
+The local frontend is available in `ui/index.html`.
+
+### 1. Start local static server
+
+From repo root:
+
+```bash
+python -m http.server 5500
+```
+
+### 2. Open UI
+
+Open in browser:
+
+```text
+http://localhost:5500/ui/index.html
+```
+
+### 3. Connect to Kaggle/Colab API
+
+1. Paste current ngrok URL ending in `/ask`
+2. Enter Amharic question
+3. Click Ask
+
+## Typical Workflow
+
+1. Start notebook runtime (Kaggle/Colab)
+2. Build index once (`python -m src.cli --build`)
+3. Start Flask + ngrok bridge
+4. Copy `/ask` URL
+5. Open local UI and paste URL
+6. Ask questions from your browser
+
+## Troubleshooting
+
+1. Empty or bad answers
+   - Ensure you are using instruction-tuned model config in `src/config.py`
+   - Rebuild index after major corpus changes
+
+2. API connection failed
+   - Check notebook server is still running
+   - Check ngrok URL did not change
+   - Verify `/ask` endpoint and CORS
+
+3. `ModuleNotFoundError`
+   - Reinstall dependencies: `pip install -r requirements.txt`
+
+4. FAISS install issues on cloud
+   - Retry install
+   - If FAISS is preinstalled in environment, install remaining requirements without `faiss-cpu`
+
+## Security Notes
+
+1. Do not commit ngrok authtokens
+2. Use notebook secrets for keys
+3. If a token was exposed, revoke and regenerate it immediately
+
+## Project Structure
+
+```text
+.
+├── data/
+│   └── corpus/
+├── src/
+│   ├── cli.py
+│   ├── config.py
+│   ├── index.py
+│   ├── load_docs.py
+│   └── rag.py
+├── ui/
+│   └── index.html
+└── requirements.txt
+```
