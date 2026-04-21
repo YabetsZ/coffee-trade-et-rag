@@ -2,9 +2,9 @@ from typing import List, Tuple
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoModelForSeq2SeqLM, AutoTokenizer
 
-from .config import EMBEDDING_MODEL, GENERATION_MODEL, TOP_K
+from .config import EMBEDDING_MODEL, GENERATION_MODEL, MAX_NEW_TOKENS, TOP_K
 from .index import load_index
 
 
@@ -13,7 +13,15 @@ class RAGSystem:
         self.index, self.metadata = load_index()
         self.embedder = SentenceTransformer(EMBEDDING_MODEL)
         self.tokenizer = AutoTokenizer.from_pretrained(GENERATION_MODEL)
-        self.generator = AutoModelForSeq2SeqLM.from_pretrained(GENERATION_MODEL)
+        self.is_causal = True
+        try:
+            self.generator = AutoModelForCausalLM.from_pretrained(
+                GENERATION_MODEL,
+                device_map="auto",
+            )
+        except Exception:
+            self.is_causal = False
+            self.generator = AutoModelForSeq2SeqLM.from_pretrained(GENERATION_MODEL)
 
     def retrieve(self, query: str, top_k: int = TOP_K) -> List[dict]:
         query_embedding = self.embedder.encode(
@@ -41,11 +49,25 @@ class RAGSystem:
                 for i, ctx in enumerate(contexts)
             ]
         )
+        user_content = (
+            f"መረጃ (Context): {context_text}\n\n"
+            f"ጥያቄ (Question): {query}\n\n"
+            "እባክህ ከላይ ባለው መረጃ መሰረት ብቻ መልስ ስጥ። "
+            "መልሱ አጭር እና ግልጽ ይሁን።"
+        )
+
+        if hasattr(self.tokenizer, "apply_chat_template") and self.is_causal:
+            messages = [{"role": "user", "content": user_content}]
+            return self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+
         return (
-            "እባክህ በአማርኛ ብቻ መልስ። መልሱ አጭር እና ግልጽ ይሁን።\n\n"
-            f"ምንጮች:\n{context_text}\n\n"
-            f"ጥያቄ: {query}\n"
-            "መልስ:"
+            "<start_of_turn>user\n"
+            f"{user_content}<end_of_turn>\n"
+            "<start_of_turn>model\n"
         )
 
     def generate(self, query: str, top_k: int = TOP_K) -> Tuple[str, List[dict]]:
@@ -53,10 +75,24 @@ class RAGSystem:
         prompt = self.build_prompt(query, contexts)
 
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
-        output_ids = self.generator.generate(
-            **inputs,
-            max_new_tokens=128,
-            do_sample=False,
-        )
-        answer = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+
+        if self.is_causal:
+            inputs = {k: v.to(self.generator.device) for k, v in inputs.items()}
+            output_ids = self.generator.generate(
+                **inputs,
+                max_new_tokens=MAX_NEW_TOKENS,
+                do_sample=False,
+                pad_token_id=self.tokenizer.eos_token_id,
+            )
+            input_len = inputs["input_ids"].shape[1]
+            answer_tokens = output_ids[0][input_len:]
+            answer = self.tokenizer.decode(answer_tokens, skip_special_tokens=True)
+        else:
+            output_ids = self.generator.generate(
+                **inputs,
+                max_new_tokens=MAX_NEW_TOKENS,
+                do_sample=False,
+            )
+            answer = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+
         return answer.strip(), contexts
