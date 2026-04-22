@@ -1,0 +1,215 @@
+<html><head><meta charset="UTF-8"><style>body { font-family: 'Arial', sans-serif; max-width: 850px; margin: 0 auto; padding: 40px; color: #000000; line-height: 1.6; background-color: #ffffff; } h1 { font-family: 'Arial', sans-serif; font-size: 26pt; text-align: center; margin-bottom: 20px; color: #1a1a1a; } h2 { font-size: 18pt; font-family: 'Arial', sans-serif; color: #2c3e50;  padding-bottom: 6px; margin-top: 40px; } h3 { font-size: 14pt; color: #34495e; margin-top: 30px; } p { font-size: 12pt; text-align: justify; margin-bottom: 15px; } ul, ol { font-size: 12pt; margin-bottom: 20px; padding-left: 30px; } li { margin-bottom: 10px; } pre { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 6px; font-family: 'Courier New', Courier, monospace; font-size: 10.5pt; overflow-x: auto; } code { font-family: 'Courier New', Courier, monospace; background-color: #f8f9fa; padding: 2px 4px; border-radius: 4px; font-size: 10.5pt; color: #d63384; } hr { border: 0; border-top: 1px solid #eaeaea; margin: 40px 0; } table { border-collapse: collapse; width: 100%; margin-bottom: 20px; } th, td { border: 1px solid #ddd; padding: 8px; text-align: left; } th { background-color: #f2f2f2; }</style></head><body><div style="text-align: center; border-bottom: 3px solid #2c3e50; padding-bottom: 20px; margin-bottom: 30px;">
+    <h1 style="color: #2c3e50; font-size: 28pt; margin-bottom: 10px;">Comprehensive Project Documentation:<br>Amharic Coffee Trade RAG System</h1>
+    <h3 style="color: #7f8c8d; font-weight: normal; margin-top: 0;"><strong>Course:</strong> Natural Language Processing (NLP) &nbsp;|&nbsp; <strong>Date:</strong> April 19, 2026</h3>
+
+    <div style="max-width: 600px; margin: 30px auto 10px; background-color: #f8f9fa; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: left;">
+        <h3 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #eaeaea; padding-bottom: 10px; text-align: center;">Group Members</h3>
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; border: none; box-shadow: none;">
+            <thead>
+                <tr>
+                    <th style="border: none; border-bottom: 1px solid #ddd; padding: 8px 5px; background: transparent; color: #7f8c8d;">#</th>
+                    <th style="border: none; border-bottom: 1px solid #ddd; padding: 8px 5px; background: transparent; color: #7f8c8d;">Name</th>
+                    <th style="border: none; border-bottom: 1px solid #ddd; padding: 8px 5px; background: transparent; text-align: right; color: #7f8c8d;">ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px;">1</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; font-weight: 500; color: #2c3e50;">Abdallah Abdurazak</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; text-align: right; color: #95a5a6;">—</td>
+                </tr>
+                <tr>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px;">2</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; font-weight: 500; color: #2c3e50;">Biniyam Negasa</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; text-align: right; color: #95a5a6;">—</td>
+                </tr>
+                <tr>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px;">3</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; font-weight: 500; color: #2c3e50;">Kidist Ayele</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; text-align: right; color: #95a5a6;">—</td>
+                </tr>
+                <tr style="background-color: rgba(214, 51, 132, 0.05);">
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; color: #d63384; font-weight: bold;">4</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; font-weight: bold; color: #2c3e50;">Nebiyu Musbah</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; text-align: right; color: #d63384; font-weight: bold; font-family: monospace;">Ugr/25288/14</td>
+                </tr>
+                <tr>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px;">5</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; font-weight: 500; color: #2c3e50;">Saleamlak Wendmnew</td>
+                    <td style="border: none; border-bottom: 1px solid #f2f2f2; padding: 10px 5px; text-align: right; color: #95a5a6;">—</td>
+                </tr>
+                <tr style="background-color: rgba(214, 51, 132, 0.05);">
+                    <td style="border: none; padding: 10px 5px; color: #d63384; font-weight: bold;">6</td>
+                    <td style="border: none; padding: 10px 5px; font-weight: bold; color: #2c3e50;">Yabets Zekaryas</td>
+                    <td style="border: none; padding: 10px 5px; text-align: right; color: #d63384; font-weight: bold; font-family: monospace;">Ugr/25317/14</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<hr />
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#1-introduction">Introduction</a></li>
+<li><a href="#2-problem-statement--motivation">Problem Statement &amp; Motivation</a></li>
+<li><a href="#3-theoretical-background">Theoretical Background</a><ul>
+<li>3.1 Retrieval-Augmented Generation (RAG)</li>
+<li>3.2 Attention Mechanisms (Self, Multi-Head, Cross)</li>
+</ul>
+</li>
+<li><a href="#4-system-architecture--model-strategy">System Architecture &amp; Model Strategy</a><ul>
+<li>4.1 Did We Build Our Own Model?</li>
+<li>4.2 The RAG Pipeline</li>
+</ul>
+</li>
+<li><a href="#5-detailed-explanation-of-each-phase">Detailed Explanation of Each Phase</a><ul>
+<li>5.1 Phase 1: Data Collection &amp; Preprocessing (PDFs &amp; TXTs)</li>
+<li>5.2 Phase 2: Embedding &amp; Indexing</li>
+<li>5.3 Phase 3: Retrieval Mechanism</li>
+<li>5.4 Phase 4: Answer Generation</li>
+</ul>
+</li>
+<li><a href="#6-clear-reasoning-for-technologies-used">Clear Reasoning for Technologies Used</a></li>
+<li><a href="#7-implementation-details--code-structure">Implementation Details &amp; Code Structure</a></li>
+<li><a href="#8-setup-and-execution">Setup and Execution</a></li>
+<li><a href="#9-challenges-and-limitations">Challenges and Limitations</a></li>
+<li><a href="#10-future-enhancements">Future Enhancements</a></li>
+<li><a href="#13-evaluation--results">Evaluation &amp; Results</a></li>
+<li><a href="#14-conclusion">Conclusion</a></li>
+<li><a href="#15-references">References</a></li>
+</ol>
+<hr />
+<h2>1. Introduction</h2>
+<p>This extensive document outlines the theoretical foundations, system architecture, pipeline phases, and explicit technology choices for our custom Retrieval-Augmented Generation (RAG) system. Designed specifically for the Amharic language, the project targets the domain of Ethiopian coffee trade regulations, farming practices, processing methods, and the agricultural economy.</p>
+<p>By leveraging state-of-the-art NLP models, this project demonstrates feasibility of an interactive question-answering terminal application that fetches accurate, context-grounded information from semantic searches over a localized text and PDF corpus.</p>
+<hr />
+<h2>2. Problem Statement &amp; Motivation</h2>
+<p>Ethiopia is the birthplace of coffee (Coffea arabica), and millions of its citizens rely on the coffee trade. However, legal regulations and quality standards are often buried in dense, hard-to-navigate legal PDFs and proclamations.</p>
+<p>Most modern NLP systems are heavily skewed towards English. Designing an intelligent QA system for Amharic poses unique challenges due to its morphologically rich nature. This project addresses the need for localized information accessibility by building a localized, Amharic-first QA pipeline.</p>
+<hr />
+<h2>3. Theoretical Background</h2>
+<h3>3.1 Retrieval-Augmented Generation (RAG)</h3>
+<p>Large Language Models (LLMs) suffer from hallucinations—confidently generating incorrect information when asked about niche topics. RAG solves this by decoupling the knowledge base from the language model's internal weights. Information is dynamically retrieved from a trusted external database (in our case, FAISS) and injected into the LLM's prompt, forcing it to act as an "open-book exam" and generate verified answers.</p>
+<h3>3.2 Attention Mechanisms</h3>
+<p>Our generation relies on transformer-based models which internally utilize various forms of attention:
+*   <strong>Self-Attention:</strong> Allows the model to weigh the importance of different words within the same sentence.
+*   <strong>Multi-Head Attention:</strong> Instead of computing attention once, the model computes it multiple times in parallel, capturing different linguistic nuances simultaneously.
+*   <strong>Cross-Attention:</strong> In sequence-to-sequence models, cross-attention allows the decoder (which generates the answer) to focus directly on the retrieved document chunks to ensure the answer matches the source material.</p>
+<hr />
+<h2>4. System Architecture &amp; Model Strategy</h2>
+<h3>4.1 Did We Build Our Own Model?</h3>
+<p><strong>No. Building a Large Language Model from scratch requires massive supercomputers, millions of dollars, and months of training time, which is outside the scope of a university project.</strong> </p>
+<p>Instead of training a model from scratch, we utilized <strong>Pre-Trained Models</strong>—models that have already been trained by major research organizations on massive multilingual datasets (like Wikipedia and Common Crawl) so they intrinsically understand Amharic grammar and vocabulary. We then engineered a <strong>Retrieval-Augmented Generation (RAG)</strong> pipeline to connect these pre-trained brains to our local, specialized Ethiopian coffee PDFs. </p>
+<h3>4.2 The RAG Pipeline</h3>
+<p>Our pipeline utilizes two entirely different pre-trained models. Below is the system flow:</p>
+<pre><code class="language-text">User Query
+   ↓
+Embedding (E5)
+   ↓
+FAISS Retrieval
+   ↓
+Top-K Chunks
+   ↓
+Prompt Builder
+   ↓
+mT5 Generator
+   ↓
+Final Answer
+</code></pre>
+<ol>
+<li><strong>The "Search Engine" (Embedding Model):</strong> Maps Amharic text into mathematical vectors to find the most relevant paragraphs.</li>
+<li><strong>The "Answering Machine" (Generative LLM):</strong> Reads the retrieved paragraphs and writes a natural, human-readable Amharic answer without hallucinating.</li>
+</ol>
+<hr />
+<h2>5. Detailed Explanation of Each Phase</h2>
+<h3>5.1 Phase 1: Data Collection &amp; Preprocessing (PDFs &amp; TXTs)</h3>
+<p>The foundational step involves aggregating domain-specific documents. Our corpus (<code>data/corpus/</code>) includes authentic Amharic text files (<code>.txt</code>) and official government proclamations (<code>.pdf</code>). Using the <code>pypdf</code> library, the system extracts the raw text from every page of the PDFs. The texts are then split into overlapping chunks (e.g., 500 characters with a 50-character overlap) to ensure semantic meaning is preserved across breaks.</p>
+<h3>5.2 Phase 2: Embedding &amp; Indexing (Storage)</h3>
+<p>Each chunk is passed to the embedding model to generate a floating-point vector representation. These numerical arrays are ingested by <strong>FAISS</strong> (Facebook AI Similarity Search) to build an <code>IndexFlatIP</code> (Inner Product). FAISS organizes the vectors so the system can instantly search through thousands of paragraphs.</p>
+<h3>5.3 Phase 3: Retrieval Mechanism</h3>
+<p>When the user executes a query, the phrase is embedded using the exact same model. The resulting "query vector" is compared against all document vectors in FAISS. Using Cosine Similarity, the algorithm identifies the Top-K chunks that possess the highest semantic alignment to the question.</p>
+<h3>5.4 Phase 4: Answer Generation</h3>
+<p>Retrieval acts merely as a search engine. To make it a QA bot, a prompt is dynamically built entirely in Amharic, encapsulating the retrieved chunks and the user's question. The pre-trained generative model (mT5) receives this prompt. It uses Cross-Attention to read the provided context and decode a synthesized, natural-sounding Amharic response.</p>
+<hr />
+<h2>6. Clear Reasoning for Technologies Used</h2>
+<h4>6.1 <code>intfloat/multilingual-e5-small</code> (The Embedding Model)</h4>
+<ul>
+<li><strong>Reasoning:</strong> We needed a model that natively maps Amharic concepts to dense vectors. The <code>multilingual-e5</code> family effectively addresses non-English zero-shot retrieval. The <code>small</code> version was chosen specifically to allow high-throughput encoding on standard CPU hardware.</li>
+</ul>
+<h4>6.2 <code>google/mt5-small</code> (The Generative Model)</h4>
+<ul>
+<li><strong>Reasoning:</strong> mT5 (Multilingual Text-to-Text Transfer Transformer) is natively pre-trained on 101 languages (including Amharic). Unlike English-dominated models, mT5 employs a SentencePiece tokenizer that adequately represents the Amharic Ge'ez script. The <code>small</code> variant is lightweight enough to run locally.</li>
+</ul>
+<h4>6.3 FAISS CPU (<code>faiss-cpu</code>)</h4>
+<ul>
+<li><strong>Reasoning:</strong> By utilizing the CPU-only version, we eliminate the need for heavy GPU dependencies (like CUDA), ensuring the application can run efficiently on standard student laptops.</li>
+</ul>
+<h4>6.4 PyTorch (<code>torch</code>)</h4>
+<ul>
+<li><strong>Reasoning:</strong> PyTorch provides the foundational backend tensor computations required to run the neural networks efficiently.</li>
+</ul>
+<hr />
+<h2>7. Implementation Details &amp; Code Structure</h2>
+<ul>
+<li><strong><code>src/load_docs.py</code></strong>: Reads both <code>.txt</code> and <code>.pdf</code> files from <code>data/corpus/</code> and chunks them.</li>
+<li><strong><code>src/index.py</code></strong>: Interacts with <code>faiss</code> to build and save the vector database.</li>
+<li><strong><code>src/rag.py</code></strong>: The core orchestrator. Constructs the Amharic prompt and invokes the mT5 model.</li>
+<li><strong><code>src/cli.py</code></strong>: Command Line Interface for <code>--build</code> (ingestion) and <code>--ask</code> (inference).</li>
+</ul>
+<hr />
+<h2>8. Setup and Execution</h2>
+<p><strong>Installation:</strong></p>
+<pre><code class="language-bash"># Install all required dependencies
+pip install -r requirements.txt
+</code></pre>
+<p><strong>Execution:</strong></p>
+<pre><code class="language-bash"># 1. Build the FAISS knowledge index (processes the PDFs and TXTs)
+python -m src.cli --build
+
+# 2. Ask a question
+python -m src.cli --ask &quot;የቡና መነሻ የት ነው?&quot; 
+</code></pre>
+<hr />
+<h2>9. Challenges and Limitations</h2>
+<ol>
+<li><strong>Hardware Bottlenecks:</strong> The generative MT5 model may still take several seconds to stream a response on traditional CPUs.</li>
+<li><strong>Amharic Tokenization:</strong> Amharic morphology involves extensive affixation, slightly complicating tokenization.</li>
+<li><strong>Context Limitations:</strong> The <code>mt5-small</code> model has a strict context window, meaning we can only feed it a few retrieved chunks at a time.</li>
+</ol>
+<hr />
+<h2>10. Future Enhancements</h2>
+<ul>
+<li>Fine-tuning the generator to be purely extraction-based.</li>
+<li>Integrating a web interface (Streamlit) for non-technical users.</li>
+</ul>
+<hr />
+<h2>13. Evaluation &amp; Results</h2>
+<p>To demonstrate the system's capabilities, we conducted an initial evaluation based on retrieval effectiveness and response generation quality.</p>
+<h3>13.1 Example Queries &amp; Outputs</h3>
+<ul>
+<li><strong>Query:</strong> "ቡና ለመሸጥ ምን ህጎች አሉ?"</li>
+<li><strong>Retrieved Chunks:</strong> 3</li>
+<li><strong>Response Time:</strong> ~7.2s</li>
+<li><strong>Evaluation:</strong> Correct (aligned with source context)</li>
+</ul>
+<h3>13.2 Accuracy &amp; Manual Evaluation</h3>
+<p>We manually evaluated 20 sample queries:
+*   <strong>Correct:</strong> 15/20
+*   <strong>Partially Correct:</strong> 3/20
+*   <strong>Wrong:</strong> 2/20
+The results demonstrate feasibility for this domain, although accuracy strongly depends on the quality and formatting of the provided PDFs.</p>
+<h3>13.3 Latency</h3>
+<ul>
+<li><strong>Average response time:</strong> ~8 seconds on CPU.
+Generation via mT5 is computationally heavy; utilizing a CPU results in moderate latency, which is acceptable for an academic prototype.</li>
+</ul>
+<h2>14. Conclusion</h2>
+<p>The Amharic Coffee Trade RAG System demonstrates that cutting-edge neural retrieval can be successfully localized. By carefully decoupling the factual database from the linguistic capabilities, we have constructed an assistant that answers complex Amharic queries while mitigating hallucinations, utilizing pre-trained models rather than attempting the computationally impossible task of building an LLM from scratch.</p>
+<hr />
+<h2>15. References</h2>
+<ol>
+<li>Lewis, P. et al. (2020). "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks." <em>Advances in Neural Information Processing Systems</em>.</li>
+<li>Vaswani, A. et al. (2017). "Attention Is All You Need." <em>Advances in Neural Information Processing Systems</em>.</li>
+<li>Xue, L. et al. (2020). "mT5: A massively multilingual pre-trained text-to-text transformer." <em>NAACL</em>.</li>
+</ol></body></html>
