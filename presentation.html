@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ethiopian Coffee Knowledge Base</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@300;400;600&family=Inter:wght@300;400;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brown:   #3b1f0e;
+    --dark:    #1a0f07;
+    --gold:    #c8873a;
+    --gold2:   #e8a85a;
+    --cream:   #f5ede0;
+    --cream2:  #fffaf3;
+    --muted:   #8a6a50;
+    --green:   #4caf7d;
+    --red:     #e05555;
+  }
+
+  body {
+    font-family: 'Inter', 'Noto Sans Ethiopic', sans-serif;
+    background: #111;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  /* ── Slide container ── */
+  .deck { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    text-align: center;
+    animation: fadeIn .4s ease;
+    gap: 0;
+  }
+
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Backgrounds ── */
+  .bg-dark   { background: radial-gradient(ellipse at 20% 20%, #2a1508 0%, #0d0804 100%); }
+  .bg-warm   { background: radial-gradient(ellipse at 80% 10%, #3b1f0e 0%, #1a0a04 100%); }
+  .bg-mid    { background: linear-gradient(135deg, #1a0f07 0%, #2e1a0a 100%); }
+
+  /* ── Nav ── */
+  .nav {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(200,135,58,.25);
+    border-radius: 50px;
+    padding: 10px 24px;
+    z-index: 100;
+  }
+
+  .nav button {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: background .15s;
+  }
+
+  .nav button:hover { background: rgba(200,135,58,.15); }
+  .nav button:disabled { opacity: .3; cursor: default; }
+
+  .slide-counter {
+    font-size: .8rem;
+    color: var(--muted);
+    min-width: 60px;
+    text-align: center;
+  }
+
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--gold);
+    transition: width .3s ease;
+    z-index: 100;
+  }
+
+  /* ── Typography ── */
+  .tag {
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+    opacity: .8;
+    text-align: center;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--cream);
+  }
+
+  h2 {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: clamp(.95rem, 2vw, 1.2rem);
+    color: var(--muted);
+    margin-top: 14px;
+    max-width: 640px;
+    line-height: 1.6;
+  }
+
+  .gold { color: var(--gold2); }
+
+  /* ── Cards ── */
+  .cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 960px;
+  }
+
+  .card {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(200,135,58,.2);
+    border-radius: 14px;
+    padding: 22px 26px;
+    flex: 1;
+    min-width: 200px;
+    max-width: 280px;
+    text-align: left;
+  }
+
+  .card .num {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .card p {
+    font-size: .9rem;
+    color: #c8b8a8;
+    line-height: 1.55;
+  }
+
+  /* ── Two-col ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    width: 100%;
+    max-width: 960px;
+    text-align: left;
+    align-items: start;
+  }
+
+  .col-title {
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  ul.clean {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  ul.clean li {
+    font-size: .92rem;
+    color: #c8b8a8;
+    line-height: 1.5;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  ul.clean li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  /* ── Pipeline ── */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 960px;
+    width: 100%;
+  }
+
+  .step {
+    background: rgba(200,135,58,.12);
+    border: 1px solid rgba(200,135,58,.3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: center;
+    min-width: 110px;
+  }
+
+  .step .step-num {
+    font-size: .68rem;
+    color: var(--gold);
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .step .step-label {
+    font-size: .82rem;
+    color: var(--cream);
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .arrow {
+    color: var(--gold);
+    font-size: 1.2rem;
+    padding: 0 6px;
+    opacity: .6;
+  }
+
+  /* ── Corpus table ── */
+  .corpus-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  .corpus-card {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(200,135,58,.18);
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-align: left;
+  }
+
+  .corpus-card .topic {
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .corpus-card .files {
+    font-size: .78rem;
+    color: #a89888;
+    line-height: 1.6;
+  }
+
+  /* ── Tech table ── */
+  .tech-table {
+    width: 100%;
+    max-width: 700px;
+    border-collapse: collapse;
+  }
+
+  .tech-table td {
+    padding: 12px 18px;
+    font-size: .9rem;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    text-align: left;
+  }
+
+  .tech-table td:first-child {
+    color: var(--gold2);
+    font-weight: 500;
+    width: 200px;
+  }
+
+  .tech-table td:last-child { color: #c8b8a8; }
+
+  /* ── Strengths / Limits ── */
+  .sl-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    max-width: 860px;
+    width: 100%;
+    text-align: left;
+    align-items: start;
+  }
+
+  .sl-box {
+    background: rgba(255,255,255,.04);
+    border-radius: 14px;
+    padding: 24px 26px;
+  }
+
+  .sl-box.green { border: 1px solid rgba(76,175,125,.3); }
+  .sl-box.red   { border: 1px solid rgba(224,85,85,.3); }
+
+  .sl-box .sl-title {
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .sl-box.green .sl-title { color: var(--green); }
+  .sl-box.red   .sl-title { color: var(--red); }
+
+  .sl-box ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+
+  .sl-box ul li {
+    font-size: .88rem;
+    color: #c8b8a8;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.45;
+  }
+
+  .sl-box.green ul li::before { content: '✓'; position: absolute; left: 0; color: var(--green); }
+  .sl-box.red   ul li::before { content: '✗'; position: absolute; left: 0; color: var(--red); }
+
+  /* ── Coffee ring ── */
+  .coffee-ring {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    margin-bottom: 24px;
+    box-shadow: 0 0 40px rgba(200,135,58,.25);
+  }
+
+  /* ── Thank you ── */
+  .thankyou h1 { font-size: clamp(2.5rem, 6vw, 4rem); }
+  .thankyou .subtitle { font-size: 1rem; }
+
+  .github-link {
+    margin-top: 24px;
+    font-size: .85rem;
+    color: var(--gold);
+    text-decoration: none;
+    border: 1px solid rgba(200,135,58,.3);
+    padding: 8px 20px;
+    border-radius: 8px;
+    transition: background .15s;
+  }
+
+  .github-link:hover { background: rgba(200,135,58,.1); }
+
+  /* ── Stat pills ── */
+  .stats {
+    display: flex;
+    gap: 20px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stat {
+    background: rgba(200,135,58,.12);
+    border: 1px solid rgba(200,135,58,.25);
+    border-radius: 50px;
+    padding: 8px 22px;
+    font-size: .85rem;
+    color: var(--gold2);
+  }
+
+  .stat span { color: #fff; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- Slide 1: Title -->
+  <div class="slide bg-dark active">
+    <div class="coffee-ring">☕</div>
+    <div class="tag">NLP Assignment Presentation</div>
+    <h1>Ethiopian Coffee<br><span class="gold">Knowledge Base</span></h1>
+    <p class="subtitle">A Retrieval-Augmented Generation system for Amharic coffee information covering history, farming, brewing, processing, trade, and regulation.</p>
+    <div class="stats">
+      <div class="stat"><span>20</span> documents</div>
+      <div class="stat"><span>1190</span> chunks</div>
+      <div class="stat"><span>Amharic</span> language</div>
+      <div class="stat"><span>RAG</span> pipeline</div>
+    </div>
+  </div>
+
+  <!-- Slide 2: Problem -->
+  <div class="slide bg-warm">
+    <div class="tag">The Problem</div>
+    <h2>Ethiopian coffee knowledge is scattered</h2>
+    <div class="two-col">
+      <div>
+        <div class="col-title">The challenge</div>
+        <ul class="clean">
+          <li>Coffee knowledge spans history, farming, brewing, processing, trade, and law</li>
+          <li>Documents are spread across PDFs, articles, and reports</li>
+          <li>Hard to search manually in Amharic</li>
+          <li>No single place to ask questions and get grounded answers</li>
+        </ul>
+      </div>
+      <div>
+        <div class="col-title">What users need</div>
+        <ul class="clean">
+          <li>ቡና እንዴት ይፈላል? <span style="color:var(--muted); font-size:.82rem;">(How is coffee brewed?)</span></li>
+          <li>የኢትዮጵያ ቡና ታሪክ ምንድን ነው? <span style="color:var(--muted); font-size:.82rem;">(What is the history?)</span></li>
+          <li>ቡና ለመሸጥ ምን ህጋዊ ደንቦች አሉ? <span style="color:var(--muted); font-size:.82rem;">(Trade rules?)</span></li>
+          <li>ቡና እንዴት ይዘጋጃል? <span style="color:var(--muted); font-size:.82rem;">(How is it processed?)</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: Objectives -->
+  <div class="slide bg-mid">
+    <div class="tag">Project Objectives</div>
+    <h2>What we built</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="num">01</div>
+        <p>A question-answering system covering all aspects of Ethiopian coffee in Amharic</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <p>Retrieves relevant passages from 20 curated documents using semantic search</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <p>Generates grounded, fluent Amharic answers using Google Gemini</p>
+      </div>
+      <div class="card">
+        <div class="num">04</div>
+        <p>Demonstrates a full RAG pipeline without training a model from scratch</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: Why RAG -->
+  <div class="slide bg-dark">
+    <div class="tag">Approach</div>
+    <h2>Why RAG instead of training a model?</h2>
+    <div class="two-col">
+      <div>
+        <div class="col-title">Training from scratch requires</div>
+        <ul class="clean">
+          <li>Massive datasets (millions of examples)</li>
+          <li>Powerful GPU hardware</li>
+          <li>Weeks or months of training time</li>
+          <li>Deep ML expertise</li>
+        </ul>
+      </div>
+      <div>
+        <div class="col-title">RAG gives us</div>
+        <ul class="clean">
+          <li>Use powerful pretrained models as-is</li>
+          <li>Connect them to our own documents</li>
+          <li>Update knowledge by adding files with no retraining needed</li>
+          <li>Grounded answers from real sources, not hallucination</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: Corpus -->
+  <div class="slide bg-warm">
+    <div class="tag">Data</div>
+    <h2>Our corpus: <span class="gold">20 documents, 1190 chunks</span></h2>
+    <div class="corpus-grid">
+      <div class="corpus-card">
+        <div class="topic">History &amp; Culture</div>
+        <div class="files">coffee_history.txt<br>ethiopian_buna_wiki.txt<br>buna.txt, buna-2.txt</div>
+      </div>
+      <div class="corpus-card">
+        <div class="topic">Farming &amp; Processing</div>
+        <div class="files">coffee_farming.txt<br>coffee_processing.txt<br>coffee_plan.txt</div>
+      </div>
+      <div class="corpus-card">
+        <div class="topic">Brewing &amp; Quality</div>
+        <div class="files">coffee_brewing.txt<br>coffee_quality.txt<br>two_types_of_coffee.txt</div>
+      </div>
+      <div class="corpus-card">
+        <div class="topic">Economy &amp; Export</div>
+        <div class="files">coffee_economy.txt<br>ethiopian_coffee_export.txt<br>ethiopian_coffee_ebc.txt</div>
+      </div>
+      <div class="corpus-card">
+        <div class="topic">General Ethiopian Coffee</div>
+        <div class="files">ethiopian_coffee.txt<br>coffee_ethiopia.txt</div>
+      </div>
+      <div class="corpus-card">
+        <div class="topic">Trade &amp; Regulation</div>
+        <div class="files">coffee-proclamation.txt<br>የቡና ግብይት እና ጥራት ቁጥጥር.txt</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: Pipeline -->
+  <div class="slide bg-mid">
+    <div class="tag">Methodology</div>
+    <h2>How the system works</h2>
+    <div class="pipeline">
+      <div class="step">
+        <div class="step-num">Step 1</div>
+        <div class="step-label">Load<br>Documents</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="step-num">Step 2</div>
+        <div class="step-label">Chunk<br>Text</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="step-num">Step 3</div>
+        <div class="step-label">Embed<br>Chunks</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="step-num">Step 4</div>
+        <div class="step-label">FAISS<br>Index</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="step-num">Step 5</div>
+        <div class="step-label">Embed<br>Query</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="step-num">Step 6</div>
+        <div class="step-label">Retrieve<br>Chunks</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="step-num">Step 7</div>
+        <div class="step-label">Gemini<br>Generates</div>
+      </div>
+    </div>
+    <p class="subtitle" style="margin-top:28px; font-size:.9rem;">Chunks: 400 chars &nbsp;|&nbsp; Overlap: 80 chars &nbsp;|&nbsp; Top-K retrieval &nbsp;|&nbsp; Amharic prompt</p>
+  </div>
+
+  <!-- Slide 7: Embeddings -->
+  <div class="slide bg-dark">
+    <div class="tag">Feature Extraction</div>
+    <h2>Semantic embeddings with <span class="gold">multilingual-e5-small</span></h2>
+    <div class="two-col">
+      <div>
+        <div class="col-title">What are embeddings?</div>
+        <ul class="clean">
+          <li>Each text chunk becomes a dense numerical vector</li>
+          <li>Similar meaning produces vectors that are close together</li>
+          <li>Works across languages, Amharic included</li>
+          <li>Normalized vectors: inner product equals cosine similarity</li>
+        </ul>
+      </div>
+      <div>
+        <div class="col-title">Why not keyword search?</div>
+        <ul class="clean">
+          <li>Keywords miss synonyms and paraphrases</li>
+          <li>Amharic has many inflected word forms</li>
+          <li>Embeddings capture meaning, not just exact words</li>
+          <li>Better retrieval precision for natural questions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: FAISS -->
+  <div class="slide bg-warm">
+    <div class="tag">Retrieval</div>
+    <h2>Vector search with <span class="gold">FAISS</span></h2>
+    <div class="two-col">
+      <div>
+        <div class="col-title">What FAISS does</div>
+        <ul class="clean">
+          <li>Stores all 1190 chunk vectors in an index</li>
+          <li>At query time: embed the question, search the index</li>
+          <li>Returns the top-K most similar chunks instantly</li>
+          <li>IndexFlatIP: exact nearest-neighbor search</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 9: Generation -->
+  <div class="slide bg-mid">
+    <div class="tag">Generation</div>
+    <h2>Answering with <span class="gold">Google Gemini</span></h2>
+    <div class="two-col">
+      <div>
+        <div class="col-title">How the prompt works</div>
+        <ul class="clean">
+          <li>Retrieved chunks are inserted as context</li>
+          <li>Prompt instructs Gemini to answer only in Amharic</li>
+          <li>Must use only the provided sources</li>
+          <li>Short, natural paragraph with no lists or bullet points</li>
+          <li>State the source file at the end</li>
+        </ul>
+      </div>
+      <div>
+        <div class="col-title">Why Gemini?</div>
+        <ul class="clean">
+          <li>State-of-the-art multilingual generation</li>
+          <li>Handles Amharic fluently</li>
+          <li>Follows prompt instructions reliably</li>
+          <li>No local GPU required, fully API-based</li>
+          <li>Fallback to extractive answering if unavailable</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: Tech Stack -->
+  <div class="slide bg-dark">
+    <div class="tag">Implementation</div>
+    <h2>Tech stack</h2>
+    <table class="tech-table">
+      <tr><td>Embeddings</td><td>intfloat/multilingual-e5-small (sentence-transformers)</td></tr>
+      <tr><td>Vector Search</td><td>FAISS IndexFlatIP</td></tr>
+      <tr><td>Generation</td><td>Google Gemini (gemini-1.5-flash or gemini-2.0-flash)</td></tr>
+      <tr><td>Fallback</td><td>Extractive answering from top retrieved chunk</td></tr>
+      <tr><td>Backend API</td><td>FastAPI (Python)</td></tr>
+      <tr><td>Frontend</td><td>React + Vite</td></tr>
+      <tr><td>PDF Extraction</td><td>pypdf</td></tr>
+    </table>
+  </div>
+
+  <!-- Slide 11: Strengths & Limits -->
+  <div class="slide bg-warm">
+    <div class="tag">Evaluation</div>
+    <h2>Strengths and limitations</h2>
+    <div class="sl-grid">
+      <div class="sl-box green">
+        <div class="sl-title">Strengths</div>
+        <ul>
+          <li>Covers the full breadth of Ethiopian coffee knowledge</li>
+          <li>Amharic-native corpus and answers</li>
+          <li>Grounded answers from real documents</li>
+          <li>Fast retrieval with FAISS</li>
+          <li>Modular, add documents without retraining</li>
+          <li>Clean modern web interface</li>
+        </ul>
+      </div>
+      <div class="sl-box red">
+        <div class="sl-title">Limitations</div>
+        <ul>
+          <li>Corpus is still relatively small for some topics</li>
+          <li>PDF extraction may lose formatting from scanned files</li>
+          <li>Gemini requires API key and internet connection</li>
+         </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 12: Conclusion -->
+  <div class="slide bg-mid">
+    <div class="tag">Conclusion</div>
+    <h2>What we achieved</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="num">01</div>
+        <p>20 documents covering every aspect of Ethiopian coffee from history to regulation</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <p>Semantic search over 1190 chunks using multilingual embeddings and FAISS</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <p>Grounded Amharic answers via Google Gemini using real sources, not hallucination</p>
+      </div>
+      <div class="card">
+        <div class="num">04</div>
+        <p>Full-stack web app with React frontend and FastAPI backend, mobile responsive</p>
+      </div>
+    </div>
+    <p class="subtitle" style="margin-top:28px;">RAG lets us build a powerful knowledge system without training a model from scratch.</p>
+  </div>
+
+  <!-- Slide 13: Thank You -->
+  <div class="slide bg-dark thankyou">
+    <div class="tag">Thank You</div>
+    <h1>Questions?</h1>
+    <p class="subtitle">Ethiopian Coffee Knowledge Base, Amharic RAG System</p>
+    <a class="github-link" href="https://github.com/YabetsZ/coffee-trade-et-rag" target="_blank">
+      github.com/YabetsZ/coffee-trade-et-rag
+    </a>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button id="prev" onclick="navigate(-1)" disabled>&#8592;</button>
+  <span class="slide-counter" id="counter">1 / 13</span>
+  <button id="next" onclick="navigate(1)">&#8594;</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function navigate(dir) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(total - 1, current + dir));
+    slides[current].classList.add('active');
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+    document.getElementById('prev').disabled = current === 0;
+    document.getElementById('next').disabled = current === total - 1;
+    document.getElementById('progress').style.width = `${((current + 1) / total) * 100}%`;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') navigate(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                     navigate(-1);
+  });
+
+  // init progress
+  document.getElementById('progress').style.width = `${(1 / total) * 100}%`;
+</script>
+</body>
+</html>
