@@ -12,6 +12,17 @@ A simple Retrieval-Augmented Generation (RAG) project for an NLP assignment usin
 
 **Amharic Coffee Trade Regulation RAG System**
 
+## Group members
+
+| No. | Member Name | ID Number |
+| --- | --- | --- |
+| 1 | Abdallah Abdurazak | Ugr/25388/14 |
+| 2 | Biniyam Negasa | Ugr/25293/14 |
+| 3 | Kidist Ayele | ugr/25461/14 |
+| 4 | Nebiyu Musbah | Ugr/25288/14 |
+| 5 | Saleamlak Wendmnew | Ugr/25292/14 |
+| 6 | Yabets Zekaryas | Ugr/25317/14 |
+
 ## Project objectives
 
 1. Build a retrieval-augmented question answering system for Amharic coffee trade content.
